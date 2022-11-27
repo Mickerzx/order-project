@@ -69,8 +69,11 @@ const onInput = (event: InputEvent) => {
 
 .error-message {
   color: var(--error);
+  position: absolute;
   padding-top: 3px;
   font-size: 14px;
   text-align: center;
+  bottom: -20px;
+  width: 100%;
 }
 </style>
