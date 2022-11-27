@@ -6,9 +6,8 @@
 <script setup lang="ts"></script>
 <style scoped>
 .layout-content {
-  border: 1px solid;
   min-height: 100vh;
-  background: var(--main-background);
+  max-width: 797px;
   box-sizing: border-box;
 }
 </style>
