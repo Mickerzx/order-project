@@ -10,10 +10,14 @@ export default class AuthClient extends InstanceHttpClient {
     const { user, password } = data;
     const url = `?user=${user}&password=${password}`;
     try {
-      return await this.apiCall({
+      const user: User[] = await this.apiCall({
         method: 'GET',
         url,
       });
+      if (user.length) {
+        return user[0];
+      }
+      throw new Error();
     } catch (err) {
       throw new Error(err as string);
     }

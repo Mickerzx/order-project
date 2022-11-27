@@ -19,7 +19,8 @@ export default class OrderClient extends InstanceHttpClient {
   async approveOrder(data: { id: number; status: string }) {
     try {
       await this.apiCall({
-        method: 'POST',
+        method: 'PUT',
+        url: `${data.id}`,
         data,
       });
     } catch (err) {
@@ -31,7 +32,7 @@ export default class OrderClient extends InstanceHttpClient {
     try {
       await this.apiCall({
         method: 'DELETE',
-        data: { id },
+        url: `${id}`,
       });
     } catch (err) {
       throw new Error(err as string);

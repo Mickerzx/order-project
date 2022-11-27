@@ -2,20 +2,36 @@
   <div class="header">
     <ul class="menu">
       <li class="menu-item">
-        <router-link to="/" class="link"> Все заказы </router-link>
+        <router-link to="/" class="link"> Все заказы</router-link>
       </li>
       <li class="menu-item">
-        <router-link to="/" class="link"> Добавить заказ </router-link>
+        <router-link to="/add-order" class="link"> Добавить заказ</router-link>
       </li>
     </ul>
     <div>
-      <span class="user">Имя Фамилие</span>
-      <button class="exit-button">Выход</button>
+      <span class="user">{{ user.name }}</span>
+      <button class="exit-button" @click="logOutHandler">Выход</button>
     </div>
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useStore } from 'vuex';
+import { computed, ComputedRef } from 'vue';
+import { User } from '@/typespaces/interfaces/user.interface';
+import { AuthActionTypes } from '@/store/modules/auth/action-types';
+import { useRouter } from 'vue-router';
+
+const store = useStore();
+const router = useRouter();
+const user: ComputedRef<User> = computed(() => store.getters.getCurrentUser);
+
+const logOutHandler = () => {
+  store.dispatch(AuthActionTypes.LOG_OUT).then(() => {
+    router.push({ name: 'Auth' });
+  });
+};
+</script>
 
 <style scoped>
 .header {

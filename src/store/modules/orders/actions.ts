@@ -1,6 +1,7 @@
 import { ActionContext, ActionTree } from 'vuex';
 import { RootState } from '@/store';
 import OrderClient from '@/api/order.api';
+import { OrderStatus } from '@/typespaces/enums/orderStatus.enum';
 import { State } from './state';
 import { Mutations } from './mutations';
 import { OrdersMutationTypes } from './mutation-types';
@@ -14,7 +15,10 @@ type AugmentedActionContext = {
 
 export interface Actions {
   [OrdersActionTypes.FETCH_ORDERS]({ commit }: AugmentedActionContext): void;
-  [OrdersActionTypes.APPROVE_ORDER]({ commit }: AugmentedActionContext, payload: { id: number; status: string }): void;
+  [OrdersActionTypes.APPROVE_ORDER](
+    { commit }: AugmentedActionContext,
+    payload: { id: number; status: OrderStatus }
+  ): void;
   [OrdersActionTypes.REMOVE_ORDER]({ commit }: AugmentedActionContext, payload: number): void;
 }
 
@@ -31,7 +35,7 @@ export const actions: ActionTree<State, RootState> & Actions = {
     }
   },
 
-  async [OrdersActionTypes.APPROVE_ORDER]({ commit }, payload: { id: number; status: string }) {
+  async [OrdersActionTypes.APPROVE_ORDER]({ commit }, payload: { id: number; status: OrderStatus }) {
     commit(OrdersMutationTypes.ORDERS_LOADING);
     try {
       await client.approveOrder(payload);

@@ -18,13 +18,19 @@
 </template>
 
 <script setup lang="ts">
-import { useForm, Form } from 'vee-validate';
-import FormItem from '@/components/FormItem.vue';
+// Core
 import { ref, watch } from 'vue';
-import { authSchema } from '@/validationSchemas/auth.schema';
 import { useStore } from 'vuex';
-import { AuthActionTypes } from '@/store/modules/auth/action-types';
+import { useForm, Form } from 'vee-validate';
 import { useRouter } from 'vue-router';
+// Components
+import FormItem from '@/components/FormItem.vue';
+
+// Validation
+import { authSchema } from '@/validationSchemas/auth.schema';
+
+// ActionTypes
+import { AuthActionTypes } from '@/store/modules/auth/action-types';
 
 const httpError = ref(false);
 const router = useRouter();
@@ -48,7 +54,7 @@ const onSubmit = () => {
   store
     .dispatch(AuthActionTypes.SIGN_IN, { ...values })
     .then(() => {
-      router.push({ name: 'home' });
+      router.push('/');
     })
     .catch(() => {
       httpError.value = true;

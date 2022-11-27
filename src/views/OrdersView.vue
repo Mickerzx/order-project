@@ -9,54 +9,81 @@
         <th>Дата заказа</th>
         <th>Статус</th>
         <th>Комментарий</th>
-        <th>Действия</th>
+        <th v-if="isAdmin">Действия</th>
       </tr>
 
-      <tr v-for="user in users" :key="user.id">
-        <td>{{ user.id }}</td>
-        <td>{{ user.name }}</td>
-        <td>{{ user.address }}</td>
-        <td>{{ user.date }}</td>
-        <td>{{ user.status }}</td>
-        <td>{{ user.comment }}</td>
-        <td>
-          <button>x</button>
-          <button>v</button>
+      <tr v-for="order in orders" :key="order.id" :class="{ approve: isCompleted(order.status) }">
+        <td>{{ order.id }}</td>
+        <td>{{ order.name }}</td>
+        <td>{{ order.address }}</td>
+        <td>{{ order.date }}</td>
+        <td>{{ order.status }}</td>
+        <td>{{ order?.comment }}</td>
+        <td v-if="isAdmin">
+          <button @click="confirmRemove(order.id)">x</button>
+          <button v-if="!isCompleted(order.status)" @click="approveOrder(order)">v</button>
         </td>
       </tr>
     </table>
   </div>
+  <base-modal v-if="modalState.show" @close="closeModal" @ok-handler="removeOrder">
+    Вы действительно хотите удалить заказ?
+  </base-modal>
 </template>
 
 <script setup lang="ts">
-import BaseHeader from '@/components/BaseHeader.vue';
+// Core
+import { computed, ComputedRef, onMounted, reactive } from 'vue';
+import { useStore } from 'vuex';
 
-const users = [
-  {
-    id: 123,
-    name: 'Иван Иванов',
-    address: 'Самара, проспект Ленина, 26-25',
-    date: '05 февраля 2022',
-    status: 'Выполнен',
-    comment: 'доставить до 18:00',
-  },
-  {
-    id: 456,
-    name: 'Петр Петров',
-    address: 'Москва, проспект Московский, д.100 кв.1',
-    date: '11 июля 2022',
-    status: 'Выполнен',
-    comment: 'нет домофона',
-  },
-  {
-    id: 789,
-    name: 'Степан Степанов',
-    address: 'Екатеринбург, улица Челюскинцев, 222',
-    date: '11 июля 2022',
-    status: 'Выполнен',
-    comment: 'нет домофона',
-  },
-];
+// Components
+import BaseHeader from '@/components/BaseHeader.vue';
+import BaseModal from '@/components/BaseModal.vue';
+
+// ActionTypes
+import { OrdersActionTypes } from '@/store/modules/orders/action-types';
+
+// Interfaces
+import { Order } from '@/typespaces/interfaces/order.interface';
+
+// Enums
+import { OrderStatus } from '@/typespaces/enums/orderStatus.enum';
+
+type ModalType = {
+  show: boolean;
+  id: number | null;
+};
+
+const store = useStore();
+const modalState = reactive<ModalType>({
+  show: false,
+  id: null,
+});
+const orders: ComputedRef<Order[]> = computed(() => store.getters.getOrders);
+const isAdmin: ComputedRef<boolean> = computed(() => store.getters.isAdmin);
+
+const isCompleted = (status: OrderStatus) => status === OrderStatus.COMPLETED;
+
+const approveOrder = (order: Order) => {
+  store.dispatch(OrdersActionTypes.APPROVE_ORDER, { ...order, status: OrderStatus.COMPLETED });
+};
+const removeOrder = () => {
+  store.dispatch(OrdersActionTypes.REMOVE_ORDER, modalState.id);
+};
+
+const confirmRemove = (id: number) => {
+  modalState.id = id;
+  modalState.show = true;
+};
+
+const closeModal = () => {
+  modalState.id = null;
+  modalState.show = false;
+};
+
+onMounted(() => {
+  store.dispatch(OrdersActionTypes.FETCH_ORDERS);
+});
 </script>
 
 <style scoped>
@@ -74,6 +101,10 @@ const users = [
   border: 1px solid;
   padding: 13px 5px;
   word-wrap: break-word;
+}
+
+.approve {
+  background: #9fd1a5;
 }
 
 .order-table th {
