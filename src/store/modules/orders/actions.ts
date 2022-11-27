@@ -1,7 +1,9 @@
 import { ActionContext, ActionTree } from 'vuex';
 import { RootState } from '@/store';
 import OrderClient from '@/api/order.api';
-import { OrderStatus } from '@/typespaces/enums/orderStatus.enum';
+import { Order } from '@/typespaces/interfaces/order.interface';
+import { Query } from '@/typespaces/types/query.type';
+import { AppoveOrder } from '@/typespaces/types/order.type';
 import { State } from './state';
 import { Mutations } from './mutations';
 import { OrdersMutationTypes } from './mutation-types';
@@ -14,19 +16,20 @@ type AugmentedActionContext = {
 } & Omit<ActionContext<State, RootState>, 'commit'>;
 
 export interface Actions {
-  [OrdersActionTypes.FETCH_ORDERS]({ commit }: AugmentedActionContext): void;
-  [OrdersActionTypes.APPROVE_ORDER](
-    { commit }: AugmentedActionContext,
-    payload: { id: number; status: OrderStatus }
-  ): void;
+  [OrdersActionTypes.FETCH_ORDERS]({ commit }: AugmentedActionContext, payload?: Query): void;
+
+  [OrdersActionTypes.APPROVE_ORDER]({ commit }: AugmentedActionContext, payload: AppoveOrder): void;
+
   [OrdersActionTypes.REMOVE_ORDER]({ commit }: AugmentedActionContext, payload: number): void;
+
+  [OrdersActionTypes.CREATE_ORDER]({ commit }: AugmentedActionContext, payload: Order): void;
 }
 
 export const actions: ActionTree<State, RootState> & Actions = {
-  async [OrdersActionTypes.FETCH_ORDERS]({ commit }) {
+  async [OrdersActionTypes.FETCH_ORDERS]({ commit }, payload?: Query) {
     commit(OrdersMutationTypes.ORDERS_LOADING);
     try {
-      const response = await client.fetchOrders();
+      const response = await client.fetchOrders(payload);
       commit(OrdersMutationTypes.FETCH_ORDERS, response);
       commit(OrdersMutationTypes.ORDERS_SUCCEEDED);
     } catch (err) {
@@ -35,7 +38,7 @@ export const actions: ActionTree<State, RootState> & Actions = {
     }
   },
 
-  async [OrdersActionTypes.APPROVE_ORDER]({ commit }, payload: { id: number; status: OrderStatus }) {
+  async [OrdersActionTypes.APPROVE_ORDER]({ commit }, payload: AppoveOrder) {
     commit(OrdersMutationTypes.ORDERS_LOADING);
     try {
       await client.approveOrder(payload);
@@ -52,6 +55,17 @@ export const actions: ActionTree<State, RootState> & Actions = {
     try {
       await client.removeOrder(payload);
       commit(OrdersMutationTypes.REMOVE_ORDER, payload);
+      commit(OrdersMutationTypes.ORDERS_SUCCEEDED);
+    } catch (err) {
+      commit(OrdersMutationTypes.ORDERS_ERROR, err as string);
+      throw new Error(err as string);
+    }
+  },
+  async [OrdersActionTypes.CREATE_ORDER]({ commit }, payload: Order) {
+    commit(OrdersMutationTypes.ORDERS_LOADING);
+    try {
+      await client.createOrder(payload);
+      commit(OrdersMutationTypes.CREATE_ORDER, payload);
       commit(OrdersMutationTypes.ORDERS_SUCCEEDED);
     } catch (err) {
       commit(OrdersMutationTypes.ORDERS_ERROR, err as string);

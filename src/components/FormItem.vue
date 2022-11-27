@@ -1,36 +1,35 @@
 <template>
   <div class="input-container">
-    <label :for="name">
-      <span class="label">{{ label }}</span>
-      <input
-        :class="[{ error: errorMessage || error }, 'input']"
-        :placeholder="placeholder"
-        :id="name"
-        :name="name"
-        v-model="value"
-        @input="onInput"
-        @focus="onFocus"
-        :type="type"
-      />
-      <span class="error-message">{{ errorMessage }}</span>
-    </label>
+    <Field
+      :class="[{ error: (!meta.valid && meta.touched) || error }, 'input']"
+      :placeholder="placeholder"
+      :name="name"
+      :value="value"
+      @input="onInput"
+      :type="type"
+    />
+    <ErrorMessage class="error-message" :name="name" />
   </div>
 </template>
 
 <script setup lang="ts">
+// Core
 import { defineProps, defineEmits } from 'vue';
+import { ErrorMessage, useField, Field } from 'vee-validate';
+
+// Types
 import { InputEvent } from '@/typespaces/types/input.type';
-import { useField } from 'vee-validate';
 
 const props = defineProps({
+  value: {
+    type: String,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
   },
   placeholder: {
-    type: String,
-  },
-  label: {
     type: String,
   },
   type: {
@@ -41,13 +40,8 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:value', 'focus']);
-
-const onFocus = () => {
-  emit('focus');
-};
-
-const { value, errorMessage } = useField(props.name);
+const emit = defineEmits(['update:value']);
+const { meta } = useField(props.name);
 
 const onInput = (event: InputEvent) => {
   emit('update:value', event.target.value);
@@ -62,28 +56,21 @@ const onInput = (event: InputEvent) => {
   position: relative;
 }
 
-.label {
-  display: block;
-  padding-bottom: 5px;
-}
-
 .input {
   padding: 11px 17px;
   border: 1px solid;
   outline: none;
+  width: 250px;
 }
 
 .error {
-  border-color: red;
+  border-color: var(--error);
 }
 
 .error-message {
-  color: red;
-  display: block;
-  position: absolute;
+  color: var(--error);
   padding-top: 3px;
-  font-size: 13px;
-  width: 100%;
+  font-size: 14px;
   text-align: center;
 }
 </style>

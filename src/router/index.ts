@@ -1,9 +1,15 @@
+// Core
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Default from '@/layouts/DefaultLayout.vue';
+import { store } from '@/store';
+
+// Layouts
+import DefaultLayout from '@/layouts/DefaultLayout.vue';
+import AuthLayout from '@/layouts/AuthLayout.vue';
+
+// Views
 import AuthView from '@/views/AuthView.vue';
 import OrdersView from '@/views/OrdersView.vue';
 import AddOrderView from '@/views/AddOrderView.vue';
-import { store } from '@/store';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -11,7 +17,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Auth',
     component: AuthView,
     meta: {
-      layout: Default,
+      layout: AuthLayout,
     },
   },
   {
@@ -19,7 +25,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'Home',
     component: OrdersView,
     meta: {
-      layout: Default,
+      layout: DefaultLayout,
     },
   },
   {
@@ -27,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
     name: 'AddOrder',
     component: AddOrderView,
     meta: {
-      layout: Default,
+      layout: DefaultLayout,
     },
   },
 ];

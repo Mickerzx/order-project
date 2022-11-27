@@ -2,16 +2,18 @@ import { MutationTree } from 'vuex';
 import { Order } from '@/typespaces/interfaces/order.interface';
 import { Status } from '@/typespaces/enums/status.enum';
 import { OrderStatus } from '@/typespaces/enums/orderStatus.enum';
+import { AppoveOrder } from '@/typespaces/types/order.type';
 import { State } from './state';
 import { OrdersMutationTypes } from './mutation-types';
 
 export type Mutations<S = State> = {
   [OrdersMutationTypes.FETCH_ORDERS](state: S, payload: Order[]): void;
-  [OrdersMutationTypes.APPROVE_ORDER](state: S, payload: { id: number; status: OrderStatus }): void;
+  [OrdersMutationTypes.APPROVE_ORDER](state: S, payload: AppoveOrder): void;
   [OrdersMutationTypes.REMOVE_ORDER](state: S, payload: number): void;
   [OrdersMutationTypes.ORDERS_SUCCEEDED](state: S): void;
   [OrdersMutationTypes.ORDERS_ERROR](state: S, payload: string): void;
   [OrdersMutationTypes.ORDERS_LOADING](state: S): void;
+  [OrdersMutationTypes.CREATE_ORDER](state: S, payload: Order): void;
 };
 
 export const mutations: MutationTree<State> & Mutations = {
@@ -27,6 +29,11 @@ export const mutations: MutationTree<State> & Mutations = {
       return item;
     });
   },
+
+  [OrdersMutationTypes.CREATE_ORDER](state: State, payload: Order) {
+    state.orders.push(payload);
+  },
+
   [OrdersMutationTypes.REMOVE_ORDER](state: State, payload: number) {
     const orderIdx = state.orders.map((item) => item.id).indexOf(payload);
     state.orders.splice(orderIdx, 1);

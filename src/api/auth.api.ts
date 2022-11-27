@@ -1,4 +1,5 @@
 import { User } from '@/typespaces/interfaces/user.interface';
+import { Auth } from '@/typespaces/types/auth.type';
 import InstanceHttpClient from './instance';
 
 export default class AuthClient extends InstanceHttpClient {
@@ -6,13 +7,11 @@ export default class AuthClient extends InstanceHttpClient {
     super('users');
   }
 
-  async signIn(data: { user: string; password: string }): Promise<User> {
-    const { user, password } = data;
-    const url = `?user=${user}&password=${password}`;
+  async signIn(data: Auth): Promise<User> {
     try {
       const user: User[] = await this.apiCall({
         method: 'GET',
-        url,
+        params: data,
       });
       if (user.length) {
         return user[0];

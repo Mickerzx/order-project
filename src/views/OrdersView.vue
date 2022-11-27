@@ -1,12 +1,11 @@
 <template>
   <div>
-    <base-header />
     <table class="order-table">
       <tr>
         <th>№</th>
         <th>Имя клиента</th>
-        <th>Адрес</th>
-        <th>Дата заказа</th>
+        <th @click="sortHandler('address')" class="sort-col">Адрес</th>
+        <th @click="sortHandler('date')" class="sort-col">Дата заказа</th>
         <th>Статус</th>
         <th>Комментарий</th>
         <th v-if="isAdmin">Действия</th>
@@ -26,18 +25,17 @@
       </tr>
     </table>
   </div>
-  <base-modal v-if="modalState.show" @close="closeModal" @ok-handler="removeOrder">
+  <base-modal ok-text="Удалить" v-if="modalState.show" @close="closeModal" @ok-handler="removeOrder">
     Вы действительно хотите удалить заказ?
   </base-modal>
 </template>
 
 <script setup lang="ts">
 // Core
-import { computed, ComputedRef, onMounted, reactive } from 'vue';
+import { computed, ComputedRef, onMounted, reactive, ref } from 'vue';
 import { useStore } from 'vuex';
 
 // Components
-import BaseHeader from '@/components/BaseHeader.vue';
 import BaseModal from '@/components/BaseModal.vue';
 
 // ActionTypes
@@ -55,6 +53,7 @@ type ModalType = {
 };
 
 const store = useStore();
+const sort = ref<boolean>(false);
 const modalState = reactive<ModalType>({
   show: false,
   id: null,
@@ -81,6 +80,15 @@ const closeModal = () => {
   modalState.show = false;
 };
 
+const sortHandler = (name: string) => {
+  const query = {
+    _sort: name,
+    _order: sort.value ? 'desc' : 'asc',
+  };
+  store.dispatch(OrdersActionTypes.FETCH_ORDERS, query);
+  sort.value = !sort.value;
+};
+
 onMounted(() => {
   store.dispatch(OrdersActionTypes.FETCH_ORDERS);
 });
@@ -97,6 +105,10 @@ onMounted(() => {
   word-break: break-all;
 }
 
+.sort-col {
+  cursor: pointer;
+}
+
 .order-table td {
   border: 1px solid;
   padding: 13px 5px;
@@ -104,7 +116,7 @@ onMounted(() => {
 }
 
 .approve {
-  background: #9fd1a5;
+  background: var(--approve-order);
 }
 
 .order-table th {

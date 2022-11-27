@@ -88,14 +88,15 @@ const onSubmit = () => {
 
 .button {
   padding: 5px 34px 9px;
-  background: #fff;
+  background: var(--white);
   border: none;
   cursor: pointer;
+  margin-top: 20px;
 }
 
 .error {
-  color: red;
-  top: 20px;
+  color: var(--error);
+  top: 10px;
   position: absolute;
 }
 </style>

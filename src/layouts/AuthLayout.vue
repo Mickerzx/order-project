@@ -1,12 +1,9 @@
 <template>
-  <base-header />
   <div class="layout-content">
     <slot />
   </div>
 </template>
-<script setup lang="ts">
-import BaseHeader from '@/components/BaseHeader.vue';
-</script>
+<script setup lang="ts"></script>
 <style scoped>
 .layout-content {
   min-height: 100vh;
